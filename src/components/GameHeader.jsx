@@ -24,7 +24,17 @@ export default function GameHeader({
   return (
     <header className="text-center animate-fade-in">
       {/* Settings cog — fixed top-right on desktop, bottom-right on mobile */}
-      <div className="fixed top-4 right-4 z-40 hidden sm:block">
+      <div className="fixed top-4 right-4 z-40 hidden sm:flex items-center gap-1">
+        <a
+          href="https://github.com/elementnl/TennisGrid"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+        >
+          <Button variant="ghost" size="icon" asChild>
+            <span><img src="/github.svg" alt="" className="w-4.5 h-4.5 opacity-60 hover:opacity-100 transition-opacity dark:invert" /></span>
+          </Button>
+        </a>
         <Button
           variant="ghost"
           size="icon"
@@ -100,7 +110,17 @@ export default function GameHeader({
       </div>
 
       {/* Settings cog — fixed bottom-right on mobile */}
-      <div className="fixed bottom-4 right-4 z-40 sm:hidden">
+      <div className="fixed bottom-4 right-4 z-40 sm:hidden flex items-center gap-2">
+        <a
+          href="https://github.com/elementnl/TennisGrid"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub"
+        >
+          <Button variant="outline" size="icon" className="rounded-full shadow-md bg-card" asChild>
+            <span><img src="/github.svg" alt="" className="w-4 h-4 opacity-60 dark:invert" /></span>
+          </Button>
+        </a>
         <Button
           variant="outline"
           size="icon"

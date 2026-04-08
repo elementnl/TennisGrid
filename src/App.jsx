@@ -1,10 +1,12 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import Grid from "@/components/Grid";
 import GameHeader from "@/components/GameHeader";
 import GuessModal from "@/components/GuessModal";
 import AnswersDialog from "@/components/AnswersDialog";
 import SettingsDialog from "@/components/SettingsDialog";
-import { generatePuzzle, isPlayerValidForCell, getPlayerByName, getValidPlayersForCell, getCategoryDisplayValue } from "@/utils/puzzleGenerator";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { generatePuzzle, isPlayerValidForCell, getPlayerByName, getValidPlayersForCell, getCategoryDisplayValue, CATEGORIES } from "@/utils/puzzleGenerator";
 import { getTodayString } from "@/utils/seededRandom";
 import { useGameState } from "@/hooks/useGameState";
 import { useSettings } from "@/hooks/useSettings";
@@ -25,18 +27,56 @@ export default function App() {
   const [answersCell, setAnswersCell] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const puzzle = useMemo(() => generatePuzzle(currentDate), [currentDate]);
+  const [puzzle, setPuzzle] = useState(null);
+
+  useEffect(() => {
+    const cacheKey = `tennisgrid_puzzle_${currentDate}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        const hydrate = (cat) => {
+          const def = CATEGORIES.find(c => c.key === cat.key);
+          return def?.test ? { ...cat, test: def.test } : cat;
+        };
+        parsed.rows = parsed.rows.map(hydrate);
+        parsed.cols = parsed.cols.map(hydrate);
+        setPuzzle(parsed);
+        return;
+      } catch {}
+    }
+
+    setPuzzle(null);
+    const timer = setTimeout(() => {
+      const generated = generatePuzzle(currentDate);
+      setPuzzle(generated);
+      try {
+        const strip = ({ test, ...rest }) => rest;
+        const serializable = {
+          ...generated,
+          rows: generated.rows.map(strip),
+          cols: generated.cols.map(strip),
+        };
+        localStorage.setItem(cacheKey, JSON.stringify(serializable));
+      } catch {}
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [currentDate]);
+
   const gameState = useGameState(currentDate);
 
   // Resolve display values for categories based on units
-  const displayPuzzle = useMemo(() => ({
-    ...puzzle,
-    rows: puzzle.rows.map((cat) => ({ ...cat, value: getCategoryDisplayValue(cat, units) })),
-    cols: puzzle.cols.map((cat) => ({ ...cat, value: getCategoryDisplayValue(cat, units) })),
-  }), [puzzle, units]);
+  const displayPuzzle = useMemo(() => {
+    if (!puzzle) return null;
+    return {
+      ...puzzle,
+      rows: puzzle.rows.map((cat) => ({ ...cat, value: getCategoryDisplayValue(cat, units) })),
+      cols: puzzle.cols.map((cat) => ({ ...cat, value: getCategoryDisplayValue(cat, units) })),
+    };
+  }, [puzzle, units]);
 
   const displayGrid = useMemo(() => {
-    if (!gameState.isComplete) return gameState.grid;
+    if (!puzzle || !gameState.isComplete) return gameState.grid;
 
     return gameState.grid.map((row, rowIdx) =>
       row.map((cell, colIdx) => {
@@ -93,6 +133,15 @@ export default function App() {
 
   const [duplicateWarning, setDuplicateWarning] = useState(null);
   const [shakingCell, setShakingCell] = useState(null);
+  const [gameOverModal, setGameOverModal] = useState(null);
+  const prevComplete = useRef(gameState.isComplete);
+
+  useEffect(() => {
+    if (gameState.isComplete && !prevComplete.current) {
+      setGameOverModal(gameState.score === 9 ? "win" : "lose");
+    }
+    prevComplete.current = gameState.isComplete;
+  }, [gameState.isComplete, gameState.score]);
 
   const handleGuessSubmit = useCallback(
     (playerName) => {
@@ -138,12 +187,20 @@ export default function App() {
   };
 
   const answersPlayerList = useMemo(() => {
-    if (!answersCell) return [];
+    if (!answersCell || !puzzle) return [];
     const { row, col } = answersCell;
     const rowCat = puzzle.rows[row];
     const colCat = puzzle.cols[col];
     return getValidPlayersForCell(rowCat, colCat);
   }, [answersCell, puzzle]);
+
+  if (!puzzle) {
+    return (
+      <div className="min-h-dvh flex items-center justify-center">
+        <Loader2 size={32} className="animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-150 mx-auto px-3 sm:px-4 py-4 sm:py-6 min-h-dvh flex flex-col gap-5 sm:gap-7">
@@ -197,6 +254,23 @@ export default function App() {
         units={units}
         setUnits={setUnits}
       />
+
+      {gameOverModal && (
+        <Dialog open onOpenChange={(open) => { if (!open) setGameOverModal(null); }}>
+          <DialogContent className="sm:max-w-xs text-center">
+            <DialogHeader>
+              <DialogTitle className="text-xl">
+                {gameOverModal === "win" ? "You win!" : "Out of guesses!"}
+              </DialogTitle>
+              <DialogDescription>
+                {gameOverModal === "win"
+                  ? "You got all 9 correct"
+                  : "Click the squares you missed to see possible answers"}
+              </DialogDescription>
+            </DialogHeader>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

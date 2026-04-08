@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 
 const STORAGE_KEY_PREFIX = "tennisGrid_";
-const MAX_GUESSES = 9;
+const MAX_GUESSES = 1;
 
 function loadState(dateStr) {
   try {

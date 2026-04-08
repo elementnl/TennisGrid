@@ -133,6 +133,8 @@ function scorePuzzle(rows, cols) {
   const maxAppearances = Math.max(...Object.values(playerAppearances));
   const avgCount = cellCounts.reduce((a, b) => a + b, 0) / 9;
 
+  if (maxAppearances > 5) return -Infinity;
+
   let score = 0;
   if (avgCount >= 3 && avgCount <= 15) score += 10;
   else if (avgCount >= 2 && avgCount <= 30) score += 5;

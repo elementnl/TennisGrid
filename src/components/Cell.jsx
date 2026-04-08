@@ -75,6 +75,7 @@ export default function Cell({ cellData, onSelect, disabled, rowIdx, colIdx, sha
         <span className="font-bold text-xs sm:text-sm leading-tight wrap-break-word text-amber-600 dark:text-amber-400">
           {cellData.playerName}
         </span>
+        <Eye size={12} className="text-amber-600 dark:text-amber-400 shrink-0 opacity-60" strokeWidth={2} />
       </div>
     );
   }

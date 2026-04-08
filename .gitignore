@@ -1,0 +1,13 @@
+node_modules
+dist
+data/
+scripts/.atp-cache.json
+scripts/.wikidata-cache.json
+.DS_Store
+*.swp
+*.swo
+.vscode
+.idea
+.env
+.env.*
+.claude/

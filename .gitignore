@@ -1,6 +1,6 @@
 node_modules
 dist
-data/
+/data/
 scripts/.atp-cache.json
 scripts/.wikidata-cache.json
 .DS_Store

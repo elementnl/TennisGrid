@@ -223,13 +223,15 @@ function processMatchFiles(dir, prefix, tour) {
         ls.gsfl++;
       }
 
-      if (tour === 'atp' && level === 'M') {
+      const isYearEndMasters = level === 'M' && (tourneyName === 'Masters' || tourneyName === 'Masters Dec');
+
+      if (tour === 'atp' && level === 'M' && !isYearEndMasters) {
         ws.m1k++;
       } else if (tour === 'wta' && isWtaTopTier(tourneyName, level, year)) {
         ws.m1k++;
       }
 
-      if (level === 'F') ws.tft++;
+      if (level === 'F' || isYearEndMasters) ws.tft++;
 
       if (level === 'O') {
         ws.og++;

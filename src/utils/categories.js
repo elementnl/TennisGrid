@@ -22,7 +22,7 @@ export const CATEGORIES = [
 
   { key: "masters_1000_titles", label: "Masters/WTA 1000", type: "gte", threshold: 1, value: "Champion" },
   { key: "tour_finals_titles", label: "Tour Finals", type: "gte", threshold: 1, value: "Champion" },
-  { key: "olympic_medal", label: "Olympics", type: "boolean", value: "Medalist" },
+  { key: "olympic_medal", label: "Olympics", type: "boolean", value: "Medalist", disabled: true },
 
   { key: "hard_court_titles", label: "Hard Court", type: "gte", threshold: 1, value: "Title Winner" },
   { key: "clay_court_titles", label: "Clay Court", type: "gte", threshold: 1, value: "Title Winner" },
@@ -49,7 +49,7 @@ export const CATEGORIES = [
   },
 
   { key: "active_decade", label: "Active In", type: "decade" },
-  { key: "birth_decade", label: "Born In", type: "exact" },
+  { key: "birth_decade", label: "Born In", type: "exact", disabled: true },
   { key: "won_title_as_teenager", label: "Won Title", type: "boolean", value: "As Teenager" },
   { key: "turned_pro_young", label: "Turned Pro", type: "computed", value: "Before Age 18", test: (p) => p.pro_year && p.birth_year && (p.pro_year - p.birth_year) < 18 },
   { key: "win_pct_65", label: "Career Win %", type: "computed", value: "65%+", test: (p) => p.career_win_pct >= 65 },

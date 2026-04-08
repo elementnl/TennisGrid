@@ -35,14 +35,25 @@ export default function App() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        const hydrate = (cat) => {
+        const allCats = [...parsed.rows, ...parsed.cols];
+        const hasDisabled = allCats.some(cat => {
           const def = CATEGORIES.find(c => c.key === cat.key);
-          return def?.test ? { ...cat, test: def.test } : cat;
-        };
-        parsed.rows = parsed.rows.map(hydrate);
-        parsed.cols = parsed.cols.map(hydrate);
-        setPuzzle(parsed);
-        return;
+          return def?.disabled;
+        });
+
+        if (hasDisabled) {
+          localStorage.removeItem(cacheKey);
+          localStorage.removeItem(`tennisGrid_${currentDate}`);
+        } else {
+          const hydrate = (cat) => {
+            const def = CATEGORIES.find(c => c.key === cat.key);
+            return def?.test ? { ...cat, test: def.test } : cat;
+          };
+          parsed.rows = parsed.rows.map(hydrate);
+          parsed.cols = parsed.cols.map(hydrate);
+          setPuzzle(parsed);
+          return;
+        }
       } catch {}
     }
 

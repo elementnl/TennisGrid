@@ -115,7 +115,7 @@ function hasNineUniquePlayers(rows, cols) {
   return solve(0);
 }
 
-function scorePuzzle(rows, cols) {
+function scorePuzzle(rows, cols, maxAppearanceLimit = 5) {
   const cellCounts = [];
   const playerAppearances = {};
 
@@ -133,7 +133,7 @@ function scorePuzzle(rows, cols) {
   const maxAppearances = Math.max(...Object.values(playerAppearances));
   const avgCount = cellCounts.reduce((a, b) => a + b, 0) / 9;
 
-  if (maxAppearances > 5) return -Infinity;
+  if (maxAppearances > maxAppearanceLimit) return -Infinity;
 
   let score = 0;
   if (avgCount >= 3 && avgCount <= 15) score += 10;
@@ -145,16 +145,18 @@ function scorePuzzle(rows, cols) {
   return score;
 }
 
-export function generatePuzzle(dateStr) {
+function tryGenerate(dateStr, maxAppearanceLimit) {
   const seed = dateToSeed(dateStr);
   let random = createSeededRandom(seed);
 
   let bestPuzzle = null;
   let bestScore = -Infinity;
 
-  for (let attempt = 0; attempt < 500; attempt++) {
+  const activeCats = CATEGORIES.filter(c => !c.disabled);
+
+  for (let attempt = 0; attempt < 1000; attempt++) {
     const expanded = [];
-    for (const cat of CATEGORIES) {
+    for (const cat of activeCats) {
       const w = cat.weight || 1;
       for (let i = 0; i < w; i++) expanded.push(cat);
     }
@@ -199,7 +201,7 @@ export function generatePuzzle(dateStr) {
       continue;
     }
 
-    const score = scorePuzzle(rows, cols);
+    const score = scorePuzzle(rows, cols, maxAppearanceLimit);
     if (score > bestScore) {
       bestScore = score;
       bestPuzzle = { date: dateStr, rows, cols };
@@ -210,7 +212,12 @@ export function generatePuzzle(dateStr) {
     random = createSeededRandom(seed ^ Math.imul(attempt + 1, 2654435761));
   }
 
-  if (bestPuzzle) return bestPuzzle;
+  return bestPuzzle;
+}
+
+export function generatePuzzle(dateStr) {
+  const puzzle = tryGenerate(dateStr, 5) || tryGenerate(dateStr, 7) || tryGenerate(dateStr, 9);
+  if (puzzle) return puzzle;
   throw new Error(`Could not generate valid puzzle for ${dateStr}`);
 }
 

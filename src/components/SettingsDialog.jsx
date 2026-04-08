@@ -19,7 +19,7 @@ export default function SettingsDialog({ open, onClose, theme, setTheme, units, 
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle className="text-xl">Settings</DialogTitle>
           <VisuallyHidden><DialogDescription>
           </DialogDescription></VisuallyHidden>
         </DialogHeader>

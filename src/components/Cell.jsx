@@ -49,8 +49,15 @@ function PlayerImage({ playerName }) {
 export default function Cell({ cellData, onSelect, disabled, rowIdx, colIdx, shaking }) {
   // Correct answer — locked in green
   if (cellData?.correct) {
+    const clickable = disabled;
     return (
-      <div className="aspect-square flex flex-col items-center justify-center gap-1 sm:gap-2 rounded-xl border-2 p-1.5 text-center animate-pop-in bg-success/10 border-success/40">
+      <div
+        className={`aspect-square flex flex-col items-center justify-center gap-1 sm:gap-2 rounded-xl border-2 p-1.5 text-center animate-pop-in bg-success/10 border-success/40 ${clickable ? "cursor-pointer hover:bg-success/15 transition-all" : ""}`}
+        onClick={clickable ? () => onSelect(rowIdx, colIdx) : undefined}
+        role={clickable ? "button" : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        onKeyDown={clickable ? (e) => { if (e.key === "Enter" || e.key === " ") onSelect(rowIdx, colIdx); } : undefined}
+      >
         <PlayerImage playerName={cellData.playerName} />
         <span className="font-bold text-xs sm:text-sm leading-tight wrap-break-word text-success">
           {cellData.playerName}

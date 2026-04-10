@@ -70,6 +70,15 @@ export function useGameState(dateStr) {
     [dateStr]
   );
 
+  const giveUp = useCallback(() => {
+    setState((prev) => {
+      if (prev.isComplete) return prev;
+      const newState = { ...prev, isComplete: true };
+      saveState(dateStr, newState);
+      return newState;
+    });
+  }, [dateStr]);
+
   const resetGame = useCallback(() => {
     const initial = createInitialState();
     saveState(dateStr, initial);
@@ -79,6 +88,7 @@ export function useGameState(dateStr) {
   return {
     ...state,
     makeGuess,
+    giveUp,
     resetGame,
     maxGuesses: MAX_GUESSES,
     guessesRemaining: MAX_GUESSES - state.guessesUsed,

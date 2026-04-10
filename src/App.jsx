@@ -118,10 +118,7 @@ export default function App() {
   const handleCellSelect = useCallback(
     (row, col) => {
       if (gameState.isComplete) {
-        const cell = displayGrid[row][col];
-        if (cell?.revealed) {
-          setAnswersCell({ row, col });
-        }
+        setAnswersCell({ row, col });
         return;
       }
 
@@ -224,6 +221,7 @@ export default function App() {
         onNextDay={handleNextDay}
         isToday={isToday}
         onOpenSettings={() => setSettingsOpen(true)}
+        onGiveUp={gameState.giveUp}
       />
 
       <Grid

@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import TennisBallLogo from "./TennisBallLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export default function GameHeader({
   dateStr,
@@ -12,7 +14,9 @@ export default function GameHeader({
   onNextDay,
   isToday,
   onOpenSettings,
+  onGiveUp,
 }) {
+  const [showGiveUp, setShowGiveUp] = useState(false);
   const dateObj = new Date(dateStr + "T00:00:00");
   const formatted = dateObj.toLocaleDateString("en-US", {
     weekday: "short",
@@ -108,6 +112,27 @@ export default function GameHeader({
           </Badge>
         )}
       </div>
+
+      {!isComplete && (
+        <Button variant="ghost" size="sm" onClick={() => setShowGiveUp(true)} className="text-xs text-muted-foreground mt-1">
+          Give up
+        </Button>
+      )}
+
+      <Dialog open={showGiveUp} onOpenChange={(open) => { if (!open) setShowGiveUp(false); }}>
+        <DialogContent className="sm:max-w-xs text-center">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Give up?</DialogTitle>
+            <DialogDescription>
+              This will end the game and reveal all answers.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" onClick={() => setShowGiveUp(false)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => { setShowGiveUp(false); onGiveUp(); }}>Give up</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Settings cog — fixed bottom-right on mobile */}
       <div className="fixed bottom-4 right-4 z-40 sm:hidden flex items-center gap-2">
